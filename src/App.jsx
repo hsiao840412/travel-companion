@@ -49,6 +49,7 @@ try {
 
 // --- Liquid Glass Style Constants ---
 const glassCardStyle = "bg-white/40 backdrop-blur-3xl border border-white/60 shadow-[0_8px_32px_0_rgba(31,38,135,0.15)] bg-gradient-to-br from-white/40 to-white/10 relative overflow-hidden";
+// 🌟 補回遺失的 glassShine 變數，修復 ReferenceError
 const glassShine = "after:content-[''] after:absolute after:top-0 after:-left-full after:w-full after:h-full after:bg-gradient-to-r after:from-transparent after:via-white/40 after:to-transparent after:transform after:skew-x-12 after:transition-all after:duration-1000 group-hover:after:left-full";
 
 // 預設空白行程結構
@@ -137,16 +138,7 @@ const TripListModal = ({ trips, activeTripId, onSelectTrip, onDeleteTrip, onOpen
                                     {trip.date || '--/--'}
                                 </div>
                             </div>
-                            {/* 刪除按鈕 */}
-                            <button 
-                                onClick={(e) => { 
-                                    e.stopPropagation(); // 阻止冒泡，避免觸發選擇行程
-                                    onDeleteTrip(trip.id); 
-                                }} 
-                                className="p-3 text-gray-400 hover:text-red-500 hover:bg-red-100/50 rounded-full transition-all z-20"
-                            >
-                                <Trash2 size={18} />
-                            </button>
+                            <button onClick={(e) => { e.stopPropagation(); onDeleteTrip(trip.id); }} className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-100 rounded-full transition-all"><Trash2 size={18} /></button>
                         </div>
                     ))}
                 </div>
@@ -155,55 +147,6 @@ const TripListModal = ({ trips, activeTripId, onSelectTrip, onDeleteTrip, onOpen
                      <button onClick={onOpenImport} className="w-full py-3.5 rounded-2xl font-bold text-white shadow-lg flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 shadow-blue-500/30 hover:shadow-blue-500/50 active:scale-95 transition-all"><PlusCircle size={20} /> 匯入/新增行程</button>
                 </div>
             </div>
-        </div>
-    );
-};
-
-const AuthScreen = ({ onLogin, onRegister, isLoading }) => {
-    const [isRegistering, setIsRegistering] = useState(false);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-
-    const handleSubmit = () => {
-        if (!email || !password) return;
-        if (isRegistering) {
-            onRegister(email, password);
-        } else {
-            onLogin(email, password);
-        }
-    };
-
-    return (
-        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center p-6 bg-[#E0E5EC]">
-             <div className="absolute top-[-10%] left-[-10%] w-[70vw] h-[70vw] bg-blue-300/40 rounded-full blur-[100px] animate-blob mix-blend-multiply"></div>
-             <div className="absolute bottom-[-10%] right-[-10%] w-[70vw] h-[70vw] bg-pink-300/40 rounded-full blur-[100px] animate-blob animation-delay-2000 mix-blend-multiply"></div>
-             
-             <div className={`relative ${glassCardStyle} rounded-[2.5rem] p-8 w-full max-w-sm flex flex-col items-center shadow-2xl`}>
-                <div className="w-20 h-20 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-3xl flex items-center justify-center text-white shadow-lg mb-6 transform rotate-3">
-                    <User size={40} />
-                </div>
-                <h1 className="text-3xl font-[900] text-gray-800 mb-2 tracking-tight">隨身旅伴</h1>
-                <p className="text-gray-500 text-sm mb-8 font-medium">{isRegistering ? '註冊帳號以保存您的行程' : '請登入以同步您的資料'}</p>
-                
-                <div className="w-full space-y-4 mb-6">
-                    <div className="relative">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><Mail size={18} /></div>
-                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="電子信箱" className="w-full bg-white/60 border border-white/50 rounded-2xl py-3.5 pl-11 pr-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 font-bold" />
-                    </div>
-                    <div className="relative">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><Lock size={18} /></div>
-                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="密碼 (至少 6 位數)" className="w-full bg-white/60 border border-white/50 rounded-2xl py-3.5 pl-11 pr-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 font-bold" />
-                    </div>
-                </div>
-
-                <button onClick={handleSubmit} disabled={isLoading || !email || !password} className={`w-full py-4 rounded-2xl font-black text-white shadow-xl flex items-center justify-center gap-2 transition-all active:scale-95 ${!email || !password ? 'bg-gray-300 cursor-not-allowed' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-blue-500/40'}`}>
-                    {isLoading ? <RefreshCw className="animate-spin" /> : (isRegistering ? '註冊並登入' : '登入')}
-                </button>
-                
-                <button onClick={() => setIsRegistering(!isRegistering)} className="mt-6 text-sm font-bold text-gray-500 hover:text-blue-600 transition-colors">
-                    {isRegistering ? '已有帳號？點此登入' : '沒有帳號？建立新帳號'}
-                </button>
-             </div>
         </div>
     );
 };
@@ -274,6 +217,58 @@ const EditItemModal = ({ editingState, onClose, onSave }) => {
   return (
       <div className="fixed inset-0 z-[120] flex items-center justify-center p-6 animate-fade-in"><div className="absolute inset-0 bg-black/30 backdrop-blur-md" onClick={onClose}></div><div className={`relative ${glassCardStyle} rounded-[2.5rem] p-6 w-full max-w-sm transform transition-all scale-100`}><div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-white to-transparent opacity-80"></div><div className="flex justify-between items-center mb-6 relative z-10"><h2 className="text-2xl font-[800] text-gray-800 tracking-tight drop-shadow-sm">編輯項目</h2><button onClick={onClose} className="p-2 bg-white/30 rounded-full hover:bg-white/50 transition active:scale-90 border border-white/40"><X size={20} className="text-gray-700"/></button></div><div className="space-y-4 relative z-10"><div><label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">名稱</label><div className="relative"><div className={`absolute left-4 top-1/2 -translate-y-1/2 ${iconColor}`}>{isShopping ? <ShoppingBag size={18} /> : <CheckSquare size={18} />}</div><input type="text" value={itemData.item} onChange={(e) => setItemData({ ...itemData, item: e.target.value })} className={`w-full bg-white/40 border border-white/50 rounded-2xl py-3 pl-11 pr-4 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-${accentColor}-400/50 focus:bg-white/60 backdrop-blur-sm transition-all shadow-inner font-bold`} autoFocus /></div></div><div><label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">分類</label><div className="relative"><div className={`absolute left-4 top-1/2 -translate-y-1/2 ${iconColor}`}><Tag size={18} /></div><input type="text" value={itemData.category || ''} onChange={(e) => setItemData({ ...itemData, category: e.target.value })} placeholder="未分類" className={`w-full bg-white/40 border border-white/50 rounded-2xl py-3 pl-11 pr-4 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-${accentColor}-400/50 focus:bg-white/60 backdrop-blur-sm transition-all shadow-inner`} /></div></div>{isShopping && (<div><label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 ml-1">備註</label><div className="relative"><div className={`absolute left-4 top-1/2 -translate-y-1/2 ${iconColor}`}><PenLine size={18} /></div><input type="text" value={itemData.note || ''} onChange={(e) => setItemData({ ...itemData, note: e.target.value })} placeholder="備註事項" className={`w-full bg-white/40 border border-white/50 rounded-2xl py-3 pl-11 pr-4 text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-${accentColor}-400/50 focus:bg-white/60 backdrop-blur-sm transition-all shadow-inner`} /></div></div>)}<button onClick={handleSave} disabled={!itemData.item.trim()} className={`w-full py-4 rounded-2xl font-black text-white shadow-lg transition-all active:scale-95 mt-4 flex items-center justify-center gap-2 ${itemData.item.trim() ? `${gradient} shadow-${accentColor}-500/30 hover:shadow-${accentColor}-500/50` : 'bg-gray-400/50 cursor-not-allowed'}`}><CheckSquare size={20} strokeWidth={3} />儲存修改</button></div></div></div>
   );
+};
+
+const AuthScreen = ({ onLogin, onRegister, isLoading }) => {
+    const [isRegistering, setIsRegistering] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleSubmit = () => {
+        if (!email || !password) return;
+        if (isRegistering) {
+            onRegister(email, password);
+        } else {
+            onLogin(email, password);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center p-6 bg-[#E0E5EC]">
+             <div className="absolute top-[-10%] left-[-10%] w-[70vw] h-[70vw] bg-blue-300/40 rounded-full blur-[100px] animate-blob mix-blend-multiply"></div>
+             <div className="absolute bottom-[-10%] right-[-10%] w-[70vw] h-[70vw] bg-pink-300/40 rounded-full blur-[100px] animate-blob animation-delay-2000 mix-blend-multiply"></div>
+             
+             <div className={`relative ${glassCardStyle} rounded-[2.5rem] p-8 w-full max-w-sm flex flex-col items-center shadow-2xl`}>
+                <div className="w-20 h-20 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-3xl flex items-center justify-center text-white shadow-lg mb-6 transform rotate-3">
+                    <User size={40} />
+                </div>
+                <h1 className="text-3xl font-[900] text-gray-800 mb-2 tracking-tight">隨身旅伴</h1>
+                <p className="text-gray-500 text-sm mb-8 font-medium">{isRegistering ? '註冊帳號以保存您的行程' : '請登入以同步您的資料'}</p>
+                
+                <div className="w-full space-y-4 mb-6">
+                    <div className="relative">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><Mail size={18} /></div>
+                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="電子信箱" className="w-full bg-white/60 border border-white/50 rounded-2xl py-3.5 pl-11 pr-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 font-bold" />
+                    </div>
+                    <div className="relative">
+                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><Lock size={18} /></div>
+                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="密碼 (至少 6 位數)" className="w-full bg-white/60 border border-white/50 rounded-2xl py-3.5 pl-11 pr-4 text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500/30 font-bold" />
+                    </div>
+                </div>
+
+                <button onClick={handleSubmit} disabled={isLoading || !email || !password} className={`w-full py-4 rounded-2xl font-black text-white shadow-xl flex items-center justify-center gap-2 transition-all active:scale-95 ${!email || !password ? 'bg-gray-300 cursor-not-allowed' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:shadow-blue-500/40'}`}>
+                    {isLoading ? <RefreshCw className="animate-spin" /> : (isRegistering ? '註冊並登入' : '登入')}
+                </button>
+                
+                <button onClick={() => setIsRegistering(!isRegistering)} className="mt-6 text-sm font-bold text-gray-500 hover:text-blue-600 transition-colors">
+                    {isRegistering ? '已有帳號？點此登入' : '沒有帳號？建立新帳號'}
+                </button>
+                <div className="mt-4 pt-4 border-t border-gray-200/50 w-full text-center">
+                    <p className="text-[10px] text-gray-400 flex items-center justify-center gap-1"><Info size={10}/> 資料將安全儲存於雲端</p>
+                </div>
+             </div>
+        </div>
+    );
 };
 
 const HomeView = ({ trips, currentTrip, calculateDaysLeft, setActiveTab, setShowFlightModal, toggleShoppingItem, deleteShoppingItem, togglePackingItem, deletePackingItem, openEditModal, setShowTripListModal }) => (
@@ -516,14 +511,13 @@ export default function App() {
   const [editingItemState, setEditingItemState] = useState(null);
   
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
-  const [confirmModal, setConfirmModal] = useState({ show: false, title: '', message: '', onConfirm: null }); // Confirmation Modal State
-  
   const activityRefs = useRef({});
   const showToast = (message, type = 'success') => { setToast({ show: true, message, type }); };
 
   // --- 1. Auth Listener ---
   useEffect(() => {
     if (!auth) return;
+    // 監聽 Auth 狀態變化，確保 User 物件存在
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
         setUser(currentUser);
         if (currentUser) {
@@ -568,29 +562,28 @@ export default function App() {
   };
 
   const handleLogout = async () => {
-      setConfirmModal({
-          show: true,
-          title: "登出帳號",
-          message: "確定要登出目前的帳號嗎？",
-          onConfirm: async () => {
-              await signOut(auth);
-              setTrips([]);
-              setActiveTripId(null);
-              showToast("已登出");
-              setConfirmModal({ ...confirmModal, show: false });
-          }
-      });
+      if (confirm('確定要登出嗎？')) {
+          await signOut(auth);
+          setTrips([]);
+          setActiveTripId(null);
+          showToast("已登出");
+      }
   };
 
   // --- 2. Data Listener (Multi-Trip) ---
   useEffect(() => {
+    // 只有當使用者登入後才開始監聽資料
     if (!user || !db) return;
 
+    // 🌟 核心：讀取該使用者名下的所有行程
+    // Path: users/{uid}/trips
     const tripsCollectionRef = collection(db, 'users', user.uid, 'trips');
     
+    // 這裡先用簡單的 collection 監聽，避免索引錯誤
     const unsubscribe = onSnapshot(tripsCollectionRef, (snapshot) => {
         const fetchedTrips = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         
+        // 前端排序：按日期
         fetchedTrips.sort((a, b) => {
             const dateA = new Date(a.date).getTime() || 0;
             const dateB = new Date(b.date).getTime() || 0;
@@ -599,8 +592,10 @@ export default function App() {
 
         setTrips(fetchedTrips);
 
+        // 如果當前沒選中行程，且有行程資料，預設選第一個
         if (fetchedTrips.length > 0) {
              setActiveTripId(prev => {
+                 // 如果之前選的行程還在列表裡，保持選中；否則選第一個
                  return (prev && fetchedTrips.find(t => t.id === prev)) ? prev : fetchedTrips[0].id;
              });
         } else {
@@ -621,6 +616,7 @@ export default function App() {
       if (!db || !user || !activeTripId) return;
       
       const tripDocRef = doc(db, 'users', user.uid, 'trips', activeTripId);
+      // 取得當前行程的新狀態
       const newData = updater(currentTrip);
       
       try {
@@ -631,23 +627,13 @@ export default function App() {
       }
   };
 
-  const triggerDeleteTrip = (tripId) => {
-      setConfirmModal({
-          show: true,
-          title: "刪除行程",
-          message: "確定要刪除這個行程嗎？此動作無法復原。",
-          onConfirm: () => {
-              handleDeleteTrip(tripId);
-              setConfirmModal({ ...confirmModal, show: false });
-          }
-      });
-  };
-
   const handleDeleteTrip = async (tripId) => {
       if (!db || !user) return;
+      // 二次確認放在 UI 層做，這裡直接執行
       try {
           await deleteDoc(doc(db, 'users', user.uid, 'trips', tripId));
           showToast("行程已刪除");
+          // 如果刪除的是當前行程，activeTripId 會在 onSnapshot 裡自動更新
       } catch (e) {
           console.error("Delete failed", e);
           showToast("刪除失敗", "error");
@@ -673,8 +659,11 @@ export default function App() {
 
           const tripsCollectionRef = collection(db, 'users', user.uid, 'trips');
           
+          // 批次新增行程 (使用 addDoc 自動生成 ID)
           const writePromise = Promise.all(importData.map(async (trip) => {
+              // 移除原始資料可能帶有的 ID，改用 Firebase 生成的
               const { id, ...tripData } = trip;
+              // 確保基本欄位存在，避免錯誤
               const finalData = { ...DEFAULT_EMPTY_TRIP, ...tripData };
               await addDoc(tripsCollectionRef, finalData);
           }));
@@ -682,7 +671,7 @@ export default function App() {
           await Promise.race([writePromise, timeoutPromise]);
 
           setShowImportModal(false);
-          setShowTripListModal(false); 
+          setShowTripListModal(false); // 關閉列表，回到主畫面
           showToast(`成功匯入 ${importData.length} 筆行程！`);
       } catch (e) {
           console.error("Import failed", e);
@@ -692,7 +681,7 @@ export default function App() {
       }
   };
 
-  // --- Item Handlers ---
+  // --- Item Handlers (Wrapper to modify current trip) ---
   const togglePackingItem = (itemId) => updateCurrentTrip(t => ({ ...t, packingList: (t.packingList || []).map(i => i.id === itemId ? {...i, checked: !i.checked} : i) }));
   const deletePackingItem = (itemId) => updateCurrentTrip(t => ({ ...t, packingList: (t.packingList || []).filter(i => i.id !== itemId) }));
   const handleAddPackingItem = (name, category) => {
@@ -795,15 +784,6 @@ export default function App() {
       <div className="relative z-10">
         {toast.show && <Toast message={toast.message} type={toast.type} onClose={() => setToast({ ...toast, show: false })} />}
         
-        {confirmModal.show && (
-            <ConfirmModal 
-                title={confirmModal.title} 
-                message={confirmModal.message} 
-                onConfirm={confirmModal.onConfirm} 
-                onCancel={() => setConfirmModal({ ...confirmModal, show: false })} 
-            />
-        )}
-
         {showFlightModal && <FlightModal onClose={() => setShowFlightModal(false)} flights={currentTrip ? currentTrip.flights : []} />}
         {showAddShoppingModal && <AddShoppingModal onClose={() => setShowAddShoppingModal(false)} onAdd={handleAddShoppingItem} />}
         {showAddPackingModal && <AddPackingModal onClose={() => setShowAddPackingModal(false)} onAdd={handleAddPackingItem} />}
@@ -816,7 +796,7 @@ export default function App() {
                 trips={trips}
                 activeTripId={activeTripId}
                 onSelectTrip={(id) => { setActiveTripId(id); setShowTripListModal(false); setActiveTab('home'); }}
-                onDeleteTrip={triggerDeleteTrip}
+                onDeleteTrip={(id) => { if(confirm('確定要刪除此行程？')) handleDeleteTrip(id); }}
                 onOpenImport={() => setShowImportModal(true)}
                 onClose={() => setShowTripListModal(false)}
                 userEmail={user.email}
